@@ -94,6 +94,7 @@ def __display_progress_bar() -> None:
         
     
     lines = []
+    # Iterate through all progress bars and build their display lines
     for progress_bar in json_data:
         if progress_bar["style"] != 'default':
             raise NotImplementedError("Only 'default' style is implemented.")
@@ -102,20 +103,22 @@ def __display_progress_bar() -> None:
             # read_image(name, "body")
             # read_image(name, "empty")
             # ------------------------------------------------
-
         default_length = 40
-        filled_length = int(progress_bar["progress"] * default_length)
-        bar = '█' * filled_length + '-' * (default_length - filled_length)
-        percent = progress_bar["progress"] * 100
+        if progress_bar["progress"] >= 1.0:
+            filled_length = default_length
+            percent = 100.0
+            bar = '█' * filled_length
+        else:
+            filled_length = int(progress_bar["progress"] * default_length)
+            bar = '█' * filled_length + '-' * (default_length - filled_length)
+            percent = progress_bar["progress"] * 100
 
-        line = f'{progress_bar["name"]:<12} |{bar}| {percent:6.2f}%'
+        line = f'{progress_bar["name"]:<20} |{bar}| {percent:6.2f}%'
         lines.append(line)
 
-        if progress_bar["progress"] >= 1.0:
-            sys.stdout.write(f"\033[F")
-            sys.stdout.flush()
-            lines.remove(line)
-            delete_progress_bar(progress_bar["name"])
+        
+            
+
     # Combine all lines into one string
     output = "\n".join(lines)
 
@@ -163,16 +166,15 @@ if __name__ == "__main__":
     with open(STATE_FILE_DIRECTORY + STATE_FILE, 'r') as f:
         existing_data = json.load(f)
         # print(existing_data)
-    print("Starting progress bars...")
-    total_steps = 20
+    total_steps = 100
     for step in range(total_steps + 1):
         progress = step / total_steps
         update_progress_bar("Processing", progress)
-        update_progress_bar("AnotherBar", progress * 3)
-        if step == step // 2 and step != 0:
+        update_progress_bar("AnotherBar", progress= progress * 3)
+        if total_steps // 2 == step and step != 0:
             create_progress_bar("AnotherAnotherBar")
-        if step >= total_steps // 2:
-            update_progress_bar("AnotherAnotherBar", (step - total_steps // 2) / (total_steps // 2))
+        if step >= step // 2:
+            update_progress_bar("AnotherAnotherBar", progress * 1.2)
         time.sleep(0.1)  # Simulate work being done
     delete_progress_bar("Processing")
     delete_progress_bar("AnotherBar")
