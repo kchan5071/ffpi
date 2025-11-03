@@ -13,9 +13,6 @@ def create_progress_bar(progress_bar_name: str, progress: float=0.0, style: str 
     Args:
         name (str): The name of the progress bar.
         style (str): The style of the progress bar.
-
-    Returns:
-        ProgressBar: An instance of ProgressBar with specified configurations.
     """
     bar = {
         "progress_bars": { 
@@ -53,7 +50,6 @@ def create_progress_bar(progress_bar_name: str, progress: float=0.0, style: str 
     with open(STATE_FILE_DIRECTORY + STATE_FILE, 'w') as f:
         json.dump(bars, f, indent=4)
 
-
 def update_progress_bar(progress_bar_name: str, progress: float) -> None:
     """
     Update the progress of the progress bar with the given name.
@@ -75,8 +71,6 @@ def update_progress_bar(progress_bar_name: str, progress: float) -> None:
         raise FileNotFoundError("Progress bar state file not found. Please create a progress bar first.")
     
     __display_progress_bar()
-
-    
 
 def __display_progress_bar() -> None:
     """
@@ -163,19 +157,22 @@ if __name__ == "__main__":
     import time
     create_progress_bar("Processing")
     create_progress_bar("AnotherBar")
-    with open(STATE_FILE_DIRECTORY + STATE_FILE, 'r') as f:
-        existing_data = json.load(f)
-        # print(existing_data)
+    
     total_steps = 100
     for step in range(total_steps + 1):
         progress = step / total_steps
+
         update_progress_bar("Processing", progress)
         update_progress_bar("AnotherBar", progress= progress * 3)
+
+        # Create a third progress bar halfway through
         if total_steps // 2 == step and step != 0:
             create_progress_bar("AnotherAnotherBar")
         if step >= step // 2:
             update_progress_bar("AnotherAnotherBar", progress * 1.2)
+
         time.sleep(0.1)  # Simulate work being done
+    # delete progress bars after completion
     delete_progress_bar("Processing")
     delete_progress_bar("AnotherBar")
     delete_progress_bar("AnotherAnotherBar")
